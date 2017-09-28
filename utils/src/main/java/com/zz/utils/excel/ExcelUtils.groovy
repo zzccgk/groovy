@@ -1,8 +1,10 @@
 package com.zz.utils.excel
 
+import org.apache.poi.hssf.usermodel.HSSFName
 import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellAddress
 
 /**
@@ -21,8 +23,20 @@ class ExcelUtils {
         return getCell(getRow(sheet, r), l)
     }
 
-    static Cell getCell(Sheet sheet,String address){
+    static Cell getCell(Sheet sheet, String address) {
         def add = new CellAddress(address)
-        getCell(sheet,add.row,add.column)
+        getCell(sheet, add.row, add.column)
+    }
+
+    static Sheet getSheet(Workbook wb, String sheetName) {
+        return wb.getSheetAt(sheetName) ? wb.getSheet(sheetName) : wb.createSheet(sheetName)
+    }
+
+    static HSSFName createName(Cell cell, String nameName) {
+        def name = cell.sheet.workbook.createName()
+        name.nameName = nameName
+        name.sheetIndex = cell.sheet.workbook.getSheetIndex(cell.sheet)
+        name.refersToFormula = /${cell.sheet.sheetName}!${cell.address.formatAsString().replaceAll("([A-Za-z]+)",'\\$$1\\$')}/
+        name
     }
 }
